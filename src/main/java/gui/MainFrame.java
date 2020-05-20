@@ -4,6 +4,8 @@ import gui.panels.ControlPanel;
 import gui.panels.DesignPanel;
 import javax.swing.*;
 import java.awt.*;
+
+import gui.panels.PropertiesTablePanel;
 import lombok.Getter;
 
 /**
@@ -15,6 +17,7 @@ import lombok.Getter;
 public class MainFrame extends JFrame {
     private ControlPanel controlPanel;
     private DesignPanel designPanel;
+    private PropertiesTablePanel propertiesTablePanel;
 
     public MainFrame() {
         super("Dynamic_Swing_Designer");
@@ -31,12 +34,12 @@ public class MainFrame extends JFrame {
     private void initPanels() {
         controlPanel = new ControlPanel(this);
         designPanel = new DesignPanel(this, 700, 600);
+        propertiesTablePanel = new PropertiesTablePanel(this);
     }
-
 
     private void addElements() {
         add(controlPanel, BorderLayout.NORTH);
         add(designPanel, BorderLayout.CENTER);
+        add(propertiesTablePanel, BorderLayout.EAST);
     }
-
 }

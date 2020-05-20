@@ -96,6 +96,8 @@ public class ControlPanel extends JPanel {
             }
         }
         this.mainFrame.getDesignPanel().addComponent(componentInstance);
+        this.mainFrame.getDesignPanel().addFocusListenerToComponent(componentInstance);
+
     }
 
 }
