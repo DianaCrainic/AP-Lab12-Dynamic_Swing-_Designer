@@ -6,11 +6,8 @@ import lombok.*;
 import javax.swing.*;
 import javax.swing.table.DefaultTableModel;
 import java.awt.*;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
-import java.beans.BeanInfo;
-import java.beans.Introspector;
-import java.beans.PropertyDescriptor;
+import java.awt.event.*;
+import java.beans.*;
 import java.io.Serializable;
 
 /**

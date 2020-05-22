@@ -42,4 +42,11 @@ public class MainFrame extends JFrame {
         add(designPanel, BorderLayout.CENTER);
         add(propertiesTablePanel, BorderLayout.EAST);
     }
+
+    public void updateDesignPanel(DesignPanel designPanel) {
+        remove(this.designPanel);
+        this.designPanel = designPanel;
+        add(designPanel, BorderLayout.CENTER);
+        pack();
+    }
 }

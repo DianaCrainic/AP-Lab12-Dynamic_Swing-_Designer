@@ -21,10 +21,6 @@ public class PropertiesTablePanel extends JPanel {
     public PropertiesTablePanel(MainFrame mainFrame) {
         this.mainFrame = mainFrame;
         this.propertiesTable = new JTable(new DefaultTableModel(new String[]{"Type", "Name"}, 50));
-        init();
-    }
-
-    private void init() {
         setLayout(new BorderLayout());
         propertiesTable.setFillsViewportHeight(true);
         JScrollPane scrollTable = new JScrollPane(propertiesTable);

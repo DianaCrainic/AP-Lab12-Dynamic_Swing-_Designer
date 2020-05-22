@@ -2,12 +2,12 @@ package gui.panels;
 
 import gui.MainFrame;
 import javax.swing.*;
+import javax.swing.filechooser.*;
 import java.awt.*;
-import java.awt.event.ActionEvent;
-import java.awt.event.FocusEvent;
-import java.awt.event.FocusListener;
-import java.lang.reflect.Constructor;
-import java.lang.reflect.InvocationTargetException;
+import java.awt.event.*;
+import java.beans.*;
+import java.io.*;
+import java.lang.reflect.*;
 
 /**
  * ControlPanel will allow the user to specify any class name of a Swing component,
@@ -19,13 +19,16 @@ public class ControlPanel extends JPanel {
     private final JTextField componentClassTextField;
     private final JTextField componentTextField;
     private final JButton addButton;
-
+    private final JButton loadButton;
+    private final JButton saveButton;
 
     public ControlPanel(MainFrame mainFrame) {
         this.mainFrame = mainFrame;
         this.componentClassTextField = initializeTextField("Component name");
         this.componentTextField = initializeTextField("Default text");
         addButton = new JButton("Add");
+        loadButton = new JButton("Load");
+        saveButton = new JButton("Save");
         init();
     }
 
@@ -56,22 +59,26 @@ public class ControlPanel extends JPanel {
 
     private void init() {
         setLayout(new GridLayout(1, 3));
-        addElementsToContainer();
+        addElements();
         addListenersToButtons();
     }
 
-    private void addElementsToContainer() {
+    private void addElements() {
         add(componentClassTextField);
         add(componentTextField);
         add(addButton);
+        add(loadButton);
+        add(saveButton);
     }
 
     private void addListenersToButtons() {
-        addButton.addActionListener(this::add);
+        addButton.addActionListener(this::addComponent);
+        loadButton.addActionListener(this::loadDocument);
+        saveButton.addActionListener(this::savePanel);
     }
 
 
-    private void add(ActionEvent event) {
+    private void addComponent(ActionEvent event) {
         String componentName = "javax.swing." + componentClassTextField.getText();
         Class<?> componentClass = null;
         Constructor<?> constructor;
@@ -91,13 +98,53 @@ public class ControlPanel extends JPanel {
                 constructor = componentClass.getConstructor();
                 componentInstance = (Component) constructor.newInstance();
             } catch (NoSuchMethodException | IllegalAccessException | InstantiationException | InvocationTargetException e) {
-                System.out.println(e.getClass() + ": " + e.getMessage());
+                System.out.println(e.getMessage());
                 return;
             }
         }
         this.mainFrame.getDesignPanel().addComponent(componentInstance);
         this.mainFrame.getDesignPanel().addFocusListenerToComponent(componentInstance);
+    }
 
+    private void loadDocument(ActionEvent event){
+        JFileChooser fileChooser = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
+        fileChooser.setDialogTitle("Select a document");
+        fileChooser.setAcceptAllFileFilterUsed(false);
+        FileNameExtensionFilter filter = new FileNameExtensionFilter("XML", "xml");
+        fileChooser.addChoosableFileFilter(filter);
+
+        if (fileChooser.showOpenDialog(null) == JFileChooser.APPROVE_OPTION) {
+            File file = new File(fileChooser.getSelectedFile().getPath());
+            try {
+                XMLDecoder decoder = new XMLDecoder(new BufferedInputStream(new FileInputStream(file)));
+                DesignPanel designPanel = (DesignPanel) decoder.readObject();
+                decoder.close();
+                this.mainFrame.updateDesignPanel(designPanel);
+            } catch (FileNotFoundException e) {
+                System.out.println(e.getMessage());
+            }
+        }
+    }
+
+    private void savePanel(ActionEvent event){
+        JFileChooser fileChooser = new JFileChooser(FileSystemView.getFileSystemView().getHomeDirectory());
+        fileChooser.setDialogTitle("Choose where to save your file");
+        fileChooser.setFileSelectionMode(JFileChooser.DIRECTORIES_ONLY);
+
+        int returnValue = fileChooser.showSaveDialog(null);
+        if (returnValue == JFileChooser.APPROVE_OPTION) {
+            File file = new File(fileChooser.getSelectedFile() + "\\image.xml");
+            try {
+                XMLEncoder encoder = new XMLEncoder(
+                        new BufferedOutputStream(
+                                new FileOutputStream(file)));
+
+                encoder.writeObject(this.mainFrame.getDesignPanel());
+                encoder.close();
+            } catch (FileNotFoundException e) {
+                System.out.println(e.getMessage());
+            }
+        }
     }
 
 }
